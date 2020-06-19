@@ -1,34 +1,58 @@
+import logging
 import os
+import time
+
 import requests
 import telegram
-import time
 from dotenv import load_dotenv
 
 load_dotenv()
 
+logging.basicConfig(filename='example.log', level=logging.DEBUG)
+
 PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
-proxy = telegram.utils.request.Request(proxy_url='socks5://94.103.81.38:1088')
-bot = telegram.Bot(token=TELEGRAM_TOKEN, request=proxy)
+bot = telegram.Bot(token=TELEGRAM_TOKEN)
+url_praktikum = 'https://praktikum.yandex.ru/api/user_api/'
 
 
 def parse_homework_status(homework):
     homework_name = homework.get('homework_name')
-    if homework.get('status') != 'approved':
-        verdict = 'К сожалению в работе нашлись ошибки.'
+    answer = {'rejected': 'К сожалению в работе нашлись ошибки.',
+              'approved': ('Ревьюеру всё понравилось, можно '
+                           'приступать к следующему уроку.')
+              }
+    homework_status = homework.get('status')
+    if homework_status in ('rejected', 'approved'):
+        verdict = answer[homework_status]
+        return f'У вас проверили работу "{homework_name}"!\n\n{verdict}'
     else:
-        verdict = \
-            'Ревьюеру всё понравилось, можно приступать к следующему уроку.'
-    return f'У вас проверили работу "{homework_name}"!\n\n{verdict}'
+        logging.error(
+            '\tInvalid response from the server. The server responded "{}".'.format(
+                homework_status))
+        return 'Неправильный ответ от сервера.'
 
 
 def get_homework_statuses(current_timestamp):
+    if current_timestamp is None:
+        current_timestamp = int(time.time())
     headers = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
-    url = 'https://praktikum.yandex.ru/api/user_api/homework_statuses/'
-    homework_statuses = requests.get(url,
-                                     params={'from_date': current_timestamp},
-                                     headers=headers)
+    url = '{}{}'.format(url_praktikum, 'homework_statuses/')
+    try:
+        homework_statuses = requests.get(url,
+                                         params={
+                                             'from_date': current_timestamp},
+                                         headers=headers)
+    except requests.exceptions.Timeout:
+        logging.error("\tVery Slow Internet Connection.")
+        return {}
+    except requests.exceptions.ConnectionError:
+        logging.error("\tNetwork Unavailable. Check your connection.")
+        return {}
+    except requests.exceptions.MissingSchema:
+        logging.error("\t503 Service Unavailable. Retrying download ... ")
+        return {}
     return homework_statuses.json()
 
 
