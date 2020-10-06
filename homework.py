@@ -13,6 +13,9 @@ logging.basicConfig(filename='example.log', level=logging.DEBUG)
 PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+# https://spys.one/proxies/
+# proxy = telegram.utils.request.Request(proxy_url='socks5://47.110.49.177:1080')
+# bot = telegram.Bot(token=TELEGRAM_TOKEN, request=proxy)
 bot = telegram.Bot(token=TELEGRAM_TOKEN)
 url_praktikum = 'https://praktikum.yandex.ru/api/user_api/'
 
@@ -62,7 +65,17 @@ def send_message(message):
 
 def main():
     current_timestamp = int(time.time())
+
+    #Для проверки протух ли токен
     send_message('Бот успешно запущен.')
+    try:
+        new_homework = get_homework_statuses(0)
+        if new_homework.get('homeworks'):
+            send_message(
+                parse_homework_status(new_homework.get('homeworks')[0]))
+        current_timestamp = new_homework.get('current_date')
+    except Exception as e:
+        print(f'Бот упал с ошибкой: {e}')
 
     while True:
         try:
