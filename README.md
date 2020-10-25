@@ -13,5 +13,5 @@
 - ``pip install -r requirements.txt``
 5. Заполнить токены и chat_id (_PRACTICUM_TOKEN_, _TELEGRAM_TOKEN_, _TELEGRAM_CHAT_ID_)
 - ``nano .env``
-5. Запустите локальный сервер.
+6. Запустите локальный сервер.
 - ``python3 manage.py runserver``
