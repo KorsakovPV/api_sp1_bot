@@ -66,16 +66,8 @@ def send_message(message):
 def main():
     current_timestamp = int(time.time())
 
-    #Для проверки протух ли токен
-    send_message('Бот успешно запущен.')
-    try:
-        new_homework = get_homework_statuses(0)
-        if new_homework.get('homeworks'):
-            send_message(
-                parse_homework_status(new_homework.get('homeworks')[0]))
-        current_timestamp = new_homework.get('current_date')
-    except Exception as e:
-        print(f'Бот упал с ошибкой: {e}')
+    # Для проверки протух ли токен
+    # send_message('Бот успешно запущен.')
 
     while True:
         try:
