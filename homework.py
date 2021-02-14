@@ -72,6 +72,8 @@ def main():
     while True:
         try:
             new_homework = get_homework_statuses(current_timestamp)
+            if new_homework.get('message')=='Учетные данные не были предоставлены.':
+                send_message('Yandex praktikum. {}'.format(new_homework.get('message')))
             if new_homework.get('homeworks'):
                 send_message(
                     parse_homework_status(new_homework.get('homeworks')[0]))
