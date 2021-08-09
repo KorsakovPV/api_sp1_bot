@@ -20,7 +20,7 @@ YANDEX_WEATHER_KEY = os.getenv('YANDEX_WEATHER_KEY')
 bot = telegram.Bot(token=TELEGRAM_TOKEN)
 base_url_praktikum = 'https://praktikum.yandex.ru/api/user_api/'
 
-base_url_yndex_weather = 'https://api.weather.yandex.ru/v2/forecast/'
+# base_url_yndex_weather = 'https://api.weather.yandex.ru/v2/forecast/'
 
 
 def parse_homework_status(homework):
@@ -66,44 +66,44 @@ def send_message(message):
     return bot.send_message(chat_id=CHAT_ID, text=message)
 
 
-class YndexWeatherAPI:
-    def __init__(self):
-        self.cities = {'Обь': ('54.998104', '82.69529'),
-                       'Шерегеш': ('52.921485125515176', '87.98940216931146')}
+# class YndexWeatherAPI:
+#     def __init__(self):
+#         self.cities = {'Обь': ('54.998104', '82.69529'),
+#                        'Шерегеш': ('52.921485125515176', '87.98940216931146')}
 
-    def get_cities(self):
-        return ', '.join([city for city in self.cities])
+    # def get_cities(self):
+    #     return ', '.join([city for city in self.cities])
 
-    def get_api_city_weather(self, city):
-        lat, lon = self.cities.get(city)
-        headers = {'X-Yandex-API-Key': f'{YANDEX_WEATHER_KEY}'}
-        try:
-            weather = requests.get(base_url_yndex_weather,
-                                   params={'lat': lat,
-                                           'lon': lon},
-                                   headers=headers)
-        except requests.exceptions.Timeout:
-            logging.error("\tVery Slow Internet Connection.")
-            return {}
-        except requests.exceptions.ConnectionError:
-            logging.error("\tNetwork Unavailable. Check your connection.")
-            return {}
-        except requests.exceptions.MissingSchema:
-            logging.error("\t503 Service Unavailable. Retrying download ... ")
-            return {}
-        return weather.json().get('fact').get('temp')
+    # def get_api_city_weather(self, city):
+    #     lat, lon = self.cities.get(city)
+    #     headers = {'X-Yandex-API-Key': f'{YANDEX_WEATHER_KEY}'}
+    #     try:
+    #         weather = requests.get(base_url_yndex_weather,
+    #                                params={'lat': lat,
+    #                                        'lon': lon},
+    #                                headers=headers)
+    #     except requests.exceptions.Timeout:
+    #         logging.error("\tVery Slow Internet Connection.")
+    #         return {}
+    #     except requests.exceptions.ConnectionError:
+    #         logging.error("\tNetwork Unavailable. Check your connection.")
+    #         return {}
+    #     except requests.exceptions.MissingSchema:
+    #         logging.error("\t503 Service Unavailable. Retrying download ... ")
+    #         return {}
+    #     return weather.json().get('fact').get('temp')
 
-    def get_city_weather(self, city):
-        if city in self.cities.keys():
-            return self.get_api_city_weather(city)
-        else:
-            return 'Не верно указан город.'
+    # def get_city_weather(self, city):
+    #     if city in self.cities.keys():
+    #         return self.get_api_city_weather(city)
+    #     else:
+    #         return 'Не верно указан город.'
 
 
 def main():
     current_timestamp = int(time.time())
 
-    yandex_weather_api = YndexWeatherAPI()
+    # yandex_weather_api = YndexWeatherAPI()
 
     while True:
         try:
@@ -120,14 +120,14 @@ def main():
             # send_message('Доступные города {}'.format(yandex_weather_api.get_cities()))
             # send_message(yandex_weather_api.get_city_weather('Обь'))
 
-            for item in bot.get_updates():
-                mesage = item['message']['text']
-                if mesage in yandex_weather_api.cities.keys():
-                    send_message('Погода в {} {}'.format(mesage, yandex_weather_api.get_city_weather(mesage)))
+            # for item in bot.get_updates():
+            #     mesage = item['message']['text']
+                # if mesage in yandex_weather_api.cities.keys():
+                #     send_message('Погода в {} {}'.format(mesage, yandex_weather_api.get_city_weather(mesage)))
                 # send_message(mesage)
 
 
-            time.sleep(300)
+            time.sleep(1800)
 
         except Exception as e:
             print(f'Бот упал с ошибкой: {e}')
